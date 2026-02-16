@@ -35,24 +35,15 @@ export const ZUpdateProfileSchemaDTO = z.object({
 })
 
 export const ZCreateAddressSchemaDTO = z.object({
-    name: z.string(),
-    identity_code: z.string(),
-    birthdate: z.coerce.date(),
-    gender: z.union([z.literal('0'), z.literal('1')]),
-    phone1: z.string(),
-    phone2: z.string().optional(),
-    photo: z.string().optional(),
-    user_id: z.uuid()
+    street: z.string().optional(),
+    city: z.string().optional(),
+    country: z.string().optional()
 })
 
 export const ZUpdateAddressSchemaDTO = z.object({
-    name: z.string().optional(),
-    identity_code: z.string().optional(),
-    birthdate: z.coerce.date().optional(),
-    gender: z.union([z.literal('0'), z.literal('1')]).optional(),
-    phone1: z.string().optional(),
-    phone2: z.string().optional(),
-    photo: z.string().optional(),
+    street: z.string().optional(),
+    city: z.string().optional(),
+    country: z.string().optional()
 })
 
 

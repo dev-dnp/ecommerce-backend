@@ -9,7 +9,7 @@ datasource db {
 
 model addresses {
   id      String  @id @db.Uuid
-  user_id String? @db.Uuid
+  user_id String? @db.Uuid @unique
   street  String?
   city    String?
   country String?

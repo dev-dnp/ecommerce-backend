@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { ZCreateProfileSchemaDTO, ZCreateUserSchemaDTO, ZUpdateEmailUserSchemaDTO, ZUpdatePasswordUserSchemaDTO, ZUpdateProfileSchemaDTO } from "../dtos/user.dto";
+import { ZCreateAddressSchemaDTO, ZCreateProfileSchemaDTO, ZCreateUserSchemaDTO, ZUpdateEmailUserSchemaDTO, ZUpdatePasswordUserSchemaDTO, ZUpdateProfileSchemaDTO } from "../dtos/user.dto";
 import { UserService } from "../services/user.service";
 import { AppError } from "../errors/AppError";
 import z from "zod";
@@ -100,5 +100,30 @@ export class UserController
             },
             status_code: reply.statusCode
         });
+    }
+
+
+    async CreateOrUpdateAddress(request: FastifyRequest, reply: FastifyReply)
+    {
+        const bodyResult = ZCreateAddressSchemaDTO.safeParse(request.body);
+        const  paramsResult = z.object({user_id: z.uuid()}).safeParse(request.params);
+
+        if(!bodyResult.success)
+            throw new AppError("Dados incorretos enviados no corpo da requisição!");
+
+        if(!paramsResult.success)
+            throw new AppError("Parâmetro recebido inválido!");
+
+        await new UserService().CreateOrUpdateAddress(paramsResult.data.user_id, bodyResult.data);
+
+        return reply.status(200).send({
+            ok: true,
+            details: {
+                title: "Sucesso",
+                msg: "Endereço criado/atualizado com sucesso!"
+            },
+            status_code: reply.statusCode
+        });
+
     }
 }

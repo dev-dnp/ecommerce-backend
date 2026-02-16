@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma";
-import { TCreateProfileRequestDTO, TCreateUserRequestDTO, TUpdateEmailUserRequestDTO, TUpdatePasswordUserRequestDTO, TUpdateProfileRequestDTO } from "../dtos/user.dto";
+import { TCreateAddressRequestDTO, TCreateProfileRequestDTO, TCreateUserRequestDTO, TUpdateEmailUserRequestDTO, TUpdatePasswordUserRequestDTO, TUpdateProfileRequestDTO } from "../dtos/user.dto";
 import { v4 as uuidv4 } from 'uuid';
 import { AppError } from "../errors/AppError";
 import bcrypt from "bcryptjs";
@@ -182,5 +182,32 @@ export class UserService
             console.log(error);
             throw new AppError(`Ocorreu uma falha desconhecida ao atualizar o perfil do usuário ${ifUserExists.email}! Por favor, contacte o programador.`);
         }
+    }
+
+    async CreateOrUpdateAddress(user_id: string, data: TCreateAddressRequestDTO)
+    {
+
+        try
+        {
+            await prisma.addresses.upsert({
+                where: {
+                    user_id
+                },
+                update: {
+                    ...data
+                },
+                create: {
+                    id: uuidv4(),
+                    user_id,
+                    ...data,
+                }
+            });
+        }
+        catch (error)
+        {
+            console.log(error);
+            throw new AppError("Ocorreu uma falha desconhecida ao atualizar o endereço do usuário! Por favor, contacte o programador.");
+        }
+
     }
 }
