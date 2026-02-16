@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { ZCreateProfileSchemaDTO, ZCreateUserSchemaDTO, ZUpdateEmailUserSchemaDTO, ZUpdatePasswordUserSchemaDTO } from "../dtos/user.dto";
+import { ZCreateProfileSchemaDTO, ZCreateUserSchemaDTO, ZUpdateEmailUserSchemaDTO, ZUpdatePasswordUserSchemaDTO, ZUpdateProfileSchemaDTO } from "../dtos/user.dto";
 import { UserService } from "../services/user.service";
 import { AppError } from "../errors/AppError";
 import z from "zod";
@@ -62,7 +62,7 @@ export class UserController
         });
     }
 
-    async createProfile(request: FastifyRequest, reply: FastifyReply)
+    async CreateProfile(request: FastifyRequest, reply: FastifyReply)
     {
         const bodyResult = ZCreateProfileSchemaDTO.safeParse(request.body);
         const  paramsResult = z.object({user_id: z.uuid()}).safeParse(request.params);
@@ -77,6 +77,26 @@ export class UserController
             details: {
                 title: "Sucesso",
                 msg: "Perfil criado com sucesso!"
+            },
+            status_code: reply.statusCode
+        });
+    }
+
+    async UpdateProfile(request: FastifyRequest, reply: FastifyReply)
+    {
+        const bodyResult = ZUpdateProfileSchemaDTO.safeParse(request.body);
+        const  paramsResult = z.object({user_id: z.uuid()}).safeParse(request.params);
+
+        if(!bodyResult.success) throw new AppError("Dados enviados no corpo da requisição estão inválidos. Tente novamente!", undefined, "Erro de validação");
+        if(!paramsResult.success) throw new AppError("O tipo de ID enviado é inválido!", undefined, "Erro de validação");
+
+        await new UserService().UpdateProfile(paramsResult.data.user_id, bodyResult.data);
+
+        return reply.status(200).send({
+            ok: true,
+            details: {
+                title: "Sucesso",
+                msg: "Perfil atualizado com sucesso!"
             },
             status_code: reply.statusCode
         });

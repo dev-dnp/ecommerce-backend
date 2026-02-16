@@ -27,7 +27,7 @@ export const ZCreateProfileSchemaDTO = z.object({
 export const ZUpdateProfileSchemaDTO = z.object({
     name: z.string().optional(),
     identity_code: z.string().optional(),
-    birthdate: z.date().optional(),
+    birthdate: z.coerce.date().optional(),
     gender: z.union([z.literal('0'), z.literal('1')]).optional(),
     phone1: z.string().optional(),
     phone2: z.string().optional(),
@@ -37,7 +37,7 @@ export const ZUpdateProfileSchemaDTO = z.object({
 export const ZCreateAddressSchemaDTO = z.object({
     name: z.string(),
     identity_code: z.string(),
-    birthdate: z.date(),
+    birthdate: z.coerce.date(),
     gender: z.union([z.literal('0'), z.literal('1')]),
     phone1: z.string(),
     phone2: z.string().optional(),
@@ -48,7 +48,7 @@ export const ZCreateAddressSchemaDTO = z.object({
 export const ZUpdateAddressSchemaDTO = z.object({
     name: z.string().optional(),
     identity_code: z.string().optional(),
-    birthdate: z.date().optional(),
+    birthdate: z.coerce.date().optional(),
     gender: z.union([z.literal('0'), z.literal('1')]).optional(),
     phone1: z.string().optional(),
     phone2: z.string().optional(),

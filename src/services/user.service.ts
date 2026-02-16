@@ -20,17 +20,17 @@ export class UserService
 
         try
         {
-            const passwordHash = await bcrypt.hash(password, 10);
+            const passwordHashed = await bcrypt.hash(password, 10);
 
-            const createUser = await prisma.users.create({
+            const userCreated = await prisma.users.create({
                 data: {
                     id: uuidv4(),
                     email,
-                    password: passwordHash
+                    password: passwordHashed
                 }
             });
 
-            return createUser;
+            return userCreated;
         }
         catch (error)
         {
@@ -42,27 +42,37 @@ export class UserService
     async UpdateEmailUser(user_id: string, email: string)
     {
 
-        const userEmailUpdated = await prisma.users.update({
-            where: { id: user_id },
-            data: {email}
-        });
-
-        console.log(userEmailUpdated);
-
-        return;
-
         const ifUserExists = await prisma.users.findUnique({
-            where: { id: user_id }
+            where: {
+                id: user_id
+            }
         });
-    
-        if(!ifUserExists)
-            throw new AppError("ID de Usuário não encontrado!");
 
-        const userEmailUpdated2 = await prisma.users.update({
-            where: { id: user_id },
-            data: {email}
+        if(!ifUserExists)
+            throw new AppError("O ID de usuário não existe! Envie o ID correto.");
+
+        const ifEmailExists = await prisma.users.findUnique({
+            where: {
+                email
+            }
         });
-        
+
+        if(ifEmailExists)
+            throw new AppError("Este email já existe! Tente outro.");
+
+        try
+        {
+            await prisma.users.update({
+                where: { id: user_id },
+                data: {email}
+            });
+        }
+        catch(error)
+        {
+            console.log(error);
+            throw new AppError("Ocorreu uma falha desconhecida ao atualizar o email do usuário! Por favor, contacte o programador.");
+        }
+
         
     }
 
@@ -138,7 +148,7 @@ export class UserService
         catch (error)
         {
             console.log(error);
-            throw new AppError("Ocorreu uma falha desconhecida ao criar o perfil! Por favor, contacte o programador.");
+            throw new AppError(`Ocorreu uma falha desconhecida ao criar o perfil do usuário ${ifUserExists.email}! Por favor, contacte o programador.`);
         }
     }
 
@@ -170,7 +180,7 @@ export class UserService
         catch (error)
         {
             console.log(error);
-            throw new AppError("Ocorreu uma falha desconhecida ao atualizar o perfil do usuário! Por favor, contacte o programador.");
+            throw new AppError(`Ocorreu uma falha desconhecida ao atualizar o perfil do usuário ${ifUserExists.email}! Por favor, contacte o programador.`);
         }
     }
 }

@@ -11,6 +11,9 @@ export async function userRoutes(app: FastifyInstance){
 
     app.patch("/user/:user_id/password", new UserController().UpdatePasswordUser);
 
-    app.post("/user/:user_id/profile", new UserController().createProfile);
+    app.post("/user/:user_id/profile", new UserController().CreateProfile);
+
+    app.put("/user/:user_id/profile", new UserController().UpdateProfile);
+
 
 }
