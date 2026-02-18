@@ -1,15 +1,16 @@
 import fastify from "fastify";
 import { userRoutes } from "./routes/user.routes";
 import { AppError } from "./errors/AppError";
+import { productRoutes } from "./routes/product.routes";
 
 const app = fastify();
 
 app.register(userRoutes);
+app.register(productRoutes);
 
-app.setErrorHandler((error, request, reply) =>  {
+app.setErrorHandler((error, request, reply) => {
 
-    if(error instanceof AppError)
-    {
+    if (error instanceof AppError) {
         return reply
             .status(error.statusCode)
             .send({
@@ -25,17 +26,17 @@ app.setErrorHandler((error, request, reply) =>  {
     console.log(error)
 
     return reply
-            .status(500)
-            .send({
-                ok: false,
-                details: {
-                    title: "Falha no servidor!",
-                    msg: "Ocorreu um erro interno desconhecido, por favor, contacte o programador."
-                },
-                status_code: reply.statusCode,
-            })
+        .status(500)
+        .send({
+            ok: false,
+            details: {
+                title: "Falha no servidor!",
+                msg: "Ocorreu um erro interno desconhecido, por favor, contacte o programador."
+            },
+            status_code: reply.statusCode,
+        })
 
 
 });
 
-app.listen({port: 3333, host: '0.0.0.0'}).then(() => console.log("HTTP Server Running in http://0.0.0.0:3333 ❤️‍🔥"));
+app.listen({ port: 3333, host: '0.0.0.0' }).then(() => console.log("HTTP Server Running in http://0.0.0.0:3333 ❤️‍🔥"));

@@ -1,6 +1,4 @@
 import { FastifyInstance } from "fastify";
-import { prisma } from "../../lib/prisma";
-import { UserService } from "../services/user.service";
 import { UserController } from "../controllers/user.controller";
 
 export async function userRoutes(app: FastifyInstance){
@@ -16,7 +14,5 @@ export async function userRoutes(app: FastifyInstance){
     app.put("/user/:user_id/profile", new UserController().UpdateProfile);
 
     app.post("/user/:user_id/address", new UserController().CreateOrUpdateAddress);
-
-
 
 }
