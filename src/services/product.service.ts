@@ -7,11 +7,9 @@ import { TParamsQueryPaginationAndSearch } from "../types/queryParamsFilter";
 
 export class ProductService {
 
-    // Page: 2
-    // Skip: (Page(2) - 1) * 10 = 10
-    // Limit: 10
+    async gelAllProducts(query: TParamsQueryPaginationAndSearch) {
 
-    async gelAllProducts({ page_size, page, search_query }: TParamsQueryPaginationAndSearch = { page_size: 10, page: 1 }) {
+        const { page_size = 10, page = 1, search_query = "" } = query;
 
         const products = await prisma.products.findMany({
             include: {
@@ -29,6 +27,80 @@ export class ProductService {
             where: {
                 OR: [
                     { name: { contains: search_query ?? "", mode: "insensitive" } }
+                ]
+            },
+            orderBy: { created_at: "asc" },
+            skip: (page - 1) * page_size,
+            take: page_size
+
+        });
+
+        const allProducts = products.map(p => {
+            return {
+                id: p.id,
+                name: p.name,
+                description: p.description,
+                price: p.price,
+                stock: p.stock,
+                photo: p.photo,
+                created_at: p.created_at,
+                categories:
+                    p.product_categories.map(c => ({
+                        category_id: c.category_id,
+                        name: c.categories.name
+                    }))
+            }
+        })
+
+        const totalItems = await prisma.products.count();
+
+        return {
+            data: allProducts,
+            metadata: {
+                page,
+                page_size,
+                number_items: allProducts.length,
+                total_items: totalItems,
+                search_query
+            }
+        }
+    }
+
+    async getAllProductsByCategories(query: TParamsQueryPaginationAndSearch, categories: string[]) {
+
+        const { page_size = 10, page = 1, search_query = "" } = query;
+
+        const products = await prisma.products.findMany({
+            include: {
+                product_categories: {
+                    select: {
+                        category_id: true,
+                        categories: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
+                }
+            },
+            where: {
+
+                AND: [
+                    { name: { contains: search_query, mode: "insensitive" } },
+
+                    {
+
+                        product_categories: {
+                            some: {
+                                categories: {
+                                    name: {
+                                        in: categories
+                                    }
+                                }
+                            }
+                        }
+
+                    }
                 ]
             },
             orderBy: { created_at: "asc" },
@@ -145,4 +217,5 @@ export class ProductService {
             throw new AppError(`Ocorreu uma falha desconhecida ao atualizar o produto! Por favor, tente novamente ou contacte o programador.`);
         }
     }
+
 }

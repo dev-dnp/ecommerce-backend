@@ -2,11 +2,25 @@ import fastify from "fastify";
 import { userRoutes } from "./routes/user.routes";
 import { AppError } from "./errors/AppError";
 import { productRoutes } from "./routes/product.routes";
+import multipart from "@fastify/multipart";
+import { uploadRoutes } from "./routes/upload.routes";
+const qs = require('qs');
 
-const app = fastify();
+const app = fastify({
+    routerOptions: {
+        querystringParser: str => qs.parse(str)
+    }
+});
+
+app.register(multipart, {
+    limits: {
+        fieldSize: 5 * 1024 * 1024 // 5MB
+    }
+});
 
 app.register(userRoutes);
 app.register(productRoutes);
+app.register(uploadRoutes);
 
 app.setErrorHandler((error, request, reply) => {
 

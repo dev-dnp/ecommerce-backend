@@ -5,21 +5,18 @@ import { AppError } from "../errors/AppError";
 import bcrypt from "bcryptjs";
 
 
-export class UserService 
-{
-    async CreateUser({email, password}: TCreateUserRequestDTO)
-    {
+export class UserService {
+    async CreateUser({ email, password }: TCreateUserRequestDTO) {
         const userExists = await prisma.users.findUnique({
             where: {
                 email
             }
         });
 
-        if(userExists) 
+        if (userExists)
             throw new AppError("Este usuário já existe!");
 
-        try
-        {
+        try {
             const passwordHashed = await bcrypt.hash(password, 10);
 
             const userCreated = await prisma.users.create({
@@ -32,15 +29,13 @@ export class UserService
 
             return userCreated;
         }
-        catch (error)
-        {
+        catch (error) {
             console.log(error);
             throw new AppError("Ocorreu uma falha desconhecida ao registar o usuário! Por favor, contacte o programador.");
         }
     }
 
-    async UpdateEmailUser(user_id: string, email: string)
-    {
+    async UpdateEmailUser(user_id: string, email: string) {
 
         const ifUserExists = await prisma.users.findUnique({
             where: {
@@ -48,7 +43,7 @@ export class UserService
             }
         });
 
-        if(!ifUserExists)
+        if (!ifUserExists)
             throw new AppError("O ID de usuário não existe! Envie o ID correto.");
 
         const ifEmailExists = await prisma.users.findUnique({
@@ -57,45 +52,41 @@ export class UserService
             }
         });
 
-        if(ifEmailExists)
+        if (ifEmailExists)
             throw new AppError("Este email já existe! Tente outro.");
 
-        try
-        {
+        try {
             await prisma.users.update({
                 where: { id: user_id },
-                data: {email}
+                data: { email }
             });
         }
-        catch(error)
-        {
+        catch (error) {
             console.log(error);
             throw new AppError("Ocorreu uma falha desconhecida ao atualizar o email do usuário! Por favor, contacte o programador.");
         }
 
-        
+
     }
 
-    async UpdatePasswordUser(user_id: string, passwords: TUpdatePasswordUserRequestDTO)
-    {
- 
+    async UpdatePasswordUser(user_id: string, passwords: TUpdatePasswordUserRequestDTO) {
+
         const passwordHash = await prisma.users.findUnique({
             where: { id: user_id },
-            select: {password: true}
+            select: { password: true }
         });
 
-        if(!passwordHash) 
+        if (!passwordHash)
             throw new AppError("Usuário não encontrado!");
 
         const passwordEquals = await bcrypt.compare(passwords.current_password, passwordHash.password);
 
-        if(!passwordEquals)
+        if (!passwordEquals)
             throw new AppError("A senha atual está incorreta!");
 
         const newPasswordHash = await bcrypt.hash(passwords.new_password, 10);
 
-        try
-        {
+        try {
             await prisma.users.update({
                 data: {
                     password: newPasswordHash
@@ -105,16 +96,14 @@ export class UserService
                 }
             });
         }
-        catch (error)
-        {
+        catch (error) {
             console.log(error);
             throw new AppError("Ocorreu uma falha desconhecida ao atualizar a senha do usuário! Por favor, contacte o programador.");
         }
-        
+
     }
 
-    async CreateProfile(user_id: string, data: TCreateProfileRequestDTO)
-    {
+    async CreateProfile(user_id: string, data: TCreateProfileRequestDTO) {
 
         const ifProfileExists = await prisma.profiles.findFirst({
             where: {
@@ -122,7 +111,7 @@ export class UserService
             }
         });
 
-        if(ifProfileExists) throw new AppError("Este perfil já existe!");
+        if (ifProfileExists) throw new AppError("Este perfil já existe!");
 
 
         const ifUserExists = await prisma.users.findUnique({
@@ -131,10 +120,9 @@ export class UserService
             }
         });
 
-        if(!ifUserExists) throw new AppError("Usuário não encontrado! Forneça um ID válido.");
+        if (!ifUserExists) throw new AppError("Usuário não encontrado! Forneça um ID válido.");
 
-        try
-        {
+        try {
             const profileCreated = await prisma.profiles.create({
                 data: {
                     ...data,
@@ -145,15 +133,13 @@ export class UserService
 
             return profileCreated;
         }
-        catch (error)
-        {
+        catch (error) {
             console.log(error);
             throw new AppError(`Ocorreu uma falha desconhecida ao criar o perfil do usuário ${ifUserExists.email}! Por favor, contacte o programador.`);
         }
     }
 
-    async UpdateProfile(user_id: string, data: TUpdateProfileRequestDTO)
-    {
+    async UpdateProfile(user_id: string, data: TUpdateProfileRequestDTO) {
 
         const ifUserExists = await prisma.users.findUnique({
             where: {
@@ -161,10 +147,9 @@ export class UserService
             }
         });
 
-        if(!ifUserExists) throw new AppError("Usuário não encontrado! Forneça um ID válido.");
+        if (!ifUserExists) throw new AppError("Usuário não encontrado! Forneça um ID válido.");
 
-        try
-        {
+        try {
             const profileUpdated = await prisma.profiles.update({
                 data: {
                     ...data,
@@ -177,18 +162,15 @@ export class UserService
 
             return profileUpdated;
         }
-        catch (error)
-        {
+        catch (error) {
             console.log(error);
             throw new AppError(`Ocorreu uma falha desconhecida ao atualizar o perfil do usuário ${ifUserExists.email}! Por favor, contacte o programador.`);
         }
     }
 
-    async CreateOrUpdateAddress(user_id: string, data: TCreateAddressRequestDTO)
-    {
+    async CreateOrUpdateAddress(user_id: string, data: TCreateAddressRequestDTO) {
 
-        try
-        {
+        try {
             await prisma.addresses.upsert({
                 where: {
                     user_id
@@ -203,8 +185,7 @@ export class UserService
                 }
             });
         }
-        catch (error)
-        {
+        catch (error) {
             console.log(error);
             throw new AppError("Ocorreu uma falha desconhecida ao atualizar o endereço do usuário! Por favor, contacte o programador.");
         }
