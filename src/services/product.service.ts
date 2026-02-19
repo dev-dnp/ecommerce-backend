@@ -2,9 +2,72 @@ import { prisma } from "../../lib/prisma";
 import { v4 as uuidv4 } from 'uuid';
 import { AppError } from "../errors/AppError";
 import { TConnectCategoryToProductSchemaDTO, TCreateProductSchemaDTO, TUpdateProductSchemaDTO } from "../dtos/product.dto";
+import { TParamsQueryPaginationAndSearch } from "../types/queryParamsFilter";
 
 
 export class ProductService {
+
+    // Page: 2
+    // Skip: (Page(2) - 1) * 10 = 10
+    // Limit: 10
+
+    async gelAllProducts({ page_size, page, search_query }: TParamsQueryPaginationAndSearch = { page_size: 10, page: 1 }) {
+
+        const products = await prisma.products.findMany({
+            include: {
+                product_categories: {
+                    select: {
+                        category_id: true,
+                        categories: {
+                            select: {
+                                name: true
+                            }
+                        }
+                    }
+                }
+            },
+            where: {
+                OR: [
+                    { name: { contains: search_query ?? "", mode: "insensitive" } }
+                ]
+            },
+            orderBy: { created_at: "asc" },
+            skip: (page - 1) * page_size,
+            take: page_size
+
+        });
+
+        const allProducts = products.map(p => {
+            return {
+                id: p.id,
+                name: p.name,
+                description: p.description,
+                price: p.price,
+                stock: p.stock,
+                photo: p.photo,
+                created_at: p.created_at,
+                categories:
+                    p.product_categories.map(c => ({
+                        category_id: c.category_id,
+                        name: c.categories.name
+                    }))
+            }
+        })
+
+        const totalItems = await prisma.products.count();
+
+        return {
+            data: allProducts,
+            metadata: {
+                page,
+                page_size,
+                number_items: allProducts.length,
+                total_items: totalItems,
+                search_query
+            }
+        }
+    }
+
     async registerProduct(product: TCreateProductSchemaDTO, categories?: TConnectCategoryToProductSchemaDTO[]) {
 
         try {

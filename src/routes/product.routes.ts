@@ -3,8 +3,10 @@ import { ProductController } from "../controllers/product.controller";
 
 export async function productRoutes(app: FastifyInstance) {
 
-    app.post("/product", new ProductController().createProduct);
+    app.get("/products", new ProductController().getAllProducts);
 
-    app.put("/product/:product_id", new ProductController().updateProduct);
+    app.post("/products", new ProductController().createProduct);
+
+    app.put("/products/:product_id", new ProductController().updateProduct);
 
 }
