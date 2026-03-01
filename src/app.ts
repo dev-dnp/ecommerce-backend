@@ -4,6 +4,8 @@ import { AppError } from "./errors/AppError";
 import { productRoutes } from "./routes/product.routes";
 import multipart from "@fastify/multipart";
 import { uploadRoutes } from "./routes/upload.routes";
+import { cartRoutes } from "./routes/cart.routes";
+import { orderRoutes } from "./routes/order.routes";
 const qs = require('qs');
 
 const app = fastify({
@@ -21,6 +23,8 @@ app.register(multipart, {
 app.register(userRoutes);
 app.register(productRoutes);
 app.register(uploadRoutes);
+app.register(cartRoutes);
+app.register(orderRoutes);
 
 app.setErrorHandler((error, request, reply) => {
 
