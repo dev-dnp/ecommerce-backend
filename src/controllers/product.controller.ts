@@ -46,8 +46,6 @@ export class ProductController {
             search_query: ""
         }
 
-        console.log(categoriesResult.data?.categories)
-
         const products = await new ProductService().getAllProductsByCategories(query.data ?? queryDefault, categoriesResult.data?.categories || []);
 
         return reply.status(200).send(products);
@@ -65,13 +63,10 @@ export class ProductController {
         await new ProductService().registerProduct(bodyResult.data.product, bodyResult.data.categories);
 
         return reply.status(201).send({
-            ok: true,
-            details: {
-                title: "Sucesso",
-                msg: "Produto adicionado com sucesso!"
-            },
+            msg: "Produto adicionado com sucesso!",
             status_code: reply.statusCode
         });
+
     }
 
     async uploadPhotoProduct(request: FastifyRequest, reply: FastifyReply) {
@@ -101,9 +96,11 @@ export class ProductController {
 
         await new ProductService().updateProduct(queryResult.data.product_id, { photo: fileName });
 
-        return reply.send({
-            message: "Upload feito com sucesso",
-            file: fileName
+
+        return reply.status(200).send({
+            msg: "Upload feito com sucesso",
+            data: file,
+            status_code: reply.statusCode
         });
 
     }
@@ -124,12 +121,8 @@ export class ProductController {
 
         await new ProductService().updateProduct(paramsResult.data.product_id, bodyResult.data.product, bodyResult.data.categories);
 
-        return reply.status(201).send({
-            ok: true,
-            details: {
-                title: "Sucesso",
-                msg: "Produto adicionado com sucesso!"
-            },
+        return reply.status(200).send({
+            msg: "Produto atualizado com sucesso!",
             status_code: reply.statusCode
         });
     }

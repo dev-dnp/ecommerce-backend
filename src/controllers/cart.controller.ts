@@ -26,7 +26,10 @@ export class CartController {
 
         await new CartService().registerItemsInCart(user_id, cart_items);
 
-        return "Registado com sucesso!";
+        return reply.status(201).send({
+            msg: "Carrinho criado com sucesso!",
+            status_code: reply.statusCode
+        });
 
     }
 
@@ -43,7 +46,7 @@ export class CartController {
 
         const allCarts = await new CartService().getAllCartByUser(user_id);
 
-        return allCarts;
+        return reply.status(200).send(allCarts);
 
     }
 
@@ -68,7 +71,10 @@ export class CartController {
 
         await new CartService().updateItemInCart(cart_id, itemsCart);
 
-        return "Atualizado!";
+        return reply.status(200).send({
+            msg: "Itens atualizados com sucesso!",
+            status_code: reply.statusCode
+        });
 
     }
 
@@ -90,7 +96,10 @@ export class CartController {
 
         await new CartService().removeItemsInCart(cart_id, product_ids);
 
-        return "Removido com sucesso!";
+        return reply.status(200).send({
+            msg: "Itens removidos do carrinho com sucesso!",
+            status_code: reply.statusCode
+        });
     }
 
     async removeCart(request: FastifyRequest, reply: FastifyReply) {
@@ -104,7 +113,10 @@ export class CartController {
 
         await new CartService().removeCart(cart_id);
 
-        return "Carrinho eliminado com sucesso!";
+        return reply.status(200).send({
+            msg: "Carrinho removido com sucesso!",
+            status_code: reply.statusCode
+        });
 
     }
 

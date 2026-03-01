@@ -1,12 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { ProductService } from "../services/product.service";
-import z, { uuid } from "zod";
-import { ZConnectCategoryToProductSchemaDTO, ZCreateProductSchemaDTO, ZUpdateProductSchemaDTO } from "../dtos/product.dto";
+import z from "zod";
 import { AppError } from "../errors/AppError";
-import fs from "fs";
-import path from "path";
-import { randomUUID } from "crypto"
-import { CartService } from "../services/cart.service";
 import { OrderService } from "../services/order.service";
 
 export class OrderController {
@@ -21,9 +15,12 @@ export class OrderController {
 
         const { cart_id } = paramsResult.data;
 
-        const x = await new OrderService().registerOrder(cart_id);
+        await new OrderService().registerOrder(cart_id);
 
-        return x;
+        return reply.status(201).send({
+            msg: "Pedido efetuado com sucesso",
+            status_code: reply.statusCode
+        });
 
     }
 

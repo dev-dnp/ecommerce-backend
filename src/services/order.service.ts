@@ -1,9 +1,6 @@
 import { prisma } from "../../lib/prisma";
 import { v4 as uuidv4 } from 'uuid';
 import { AppError } from "../errors/AppError";
-import { TConnectCategoryToProductSchemaDTO, TCreateProductSchemaDTO, TUpdateProductSchemaDTO } from "../dtos/product.dto";
-import { TParamsQueryPaginationAndSearch } from "../types/queryParamsFilter";
-import { TAddItemsInCart } from "../dtos/cart.dto";
 import { calcTotalPay } from "../utils/calcTotalPay";
 
 
@@ -38,13 +35,14 @@ export class OrderService {
                     if (!products) return;
 
                     const totalPay = calcTotalPay(products);
-                    const user_id = cartInfo?.user_id;
+                    const user_id = cartInfo?.user_id ?? "";
 
                     await tx.orders.create({
                         data: {
                             id: uuidv4(),
                             user_id,
                             total: totalPay,
+
                             order_items: {
                                 createMany: {
                                     data: products
@@ -66,7 +64,7 @@ export class OrderService {
         }
         catch (error) {
             console.log(error);
-            throw new AppError("Ocorreu um erro desconhecido! Por favor, tente novamente ou contacte o programador")
+            throw new AppError("Ocorreu um erro desconhecido ao tentar criar o pedido! Por favor, tente novamente ou contacte o programador")
         }
 
     }
